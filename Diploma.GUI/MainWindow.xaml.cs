@@ -6,6 +6,7 @@ namespace Diploma.GUI
     using System.Linq;
     using System.ComponentModel;
     using System.Diagnostics;
+    using Diploma.Functions;
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -19,6 +20,7 @@ namespace Diploma.GUI
         public MainWindow()
         {
             this.Alghoritm = new Linear();
+            var cat = CoordinateFunctions.Construct();
             InitializeComponent();
         }
 
@@ -27,7 +29,7 @@ namespace Diploma.GUI
             this.Reset();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            this.Alghoritm.DoParallel();
+            this.Alghoritm.Compute();
             this.ProgressBar.Maximum = this.Alghoritm.ActionsCount;
             this.Alghoritm.Worker.ProgressChanged += new ProgressChangedEventHandler((object sender, ProgressChangedEventArgs e) =>
             {

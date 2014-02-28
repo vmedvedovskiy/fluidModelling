@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FuncLib">
+      <HintPath>..\Assemblies\FuncLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -93,6 +96,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Diploma.Functions\Diploma.Functions.csproj">
+      <Project>{D0D14D2A-B171-44FF-B18B-0D3E3862C446}</Project>
+      <Name>Diploma.Functions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Diploma.Managed\Diploma.Managed.csproj">
       <Project>{E0EE0FB9-F636-4FA5-A521-753A03E5EC15}</Project>
       <Name>Diploma.Managed</Name>

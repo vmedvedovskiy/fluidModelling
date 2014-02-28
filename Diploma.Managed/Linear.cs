@@ -43,7 +43,7 @@ namespace Diploma.Managed
 
         #region Methods
 
-        public void DoParallel()
+        public void Compute()
         {
             List<CoordFunction> simpleFunctions = Functions.GetCoordFunctions();
             List<CoordFunction> functions = Functions.GetOperatorCoordFunctions();
@@ -120,67 +120,6 @@ namespace Diploma.Managed
                 alglib.densesolverreport report;
                 alglib.rmatrixsolve(lhs, count, rhs.ToArray(), out info, out report, out alphas);
 
-                // Chop
-                for (int i = 0; i < count; ++i)
-                {
-                    if (Math.Abs(alphas[i]) < this.eps)
-                    {
-                        alphas[i] = 0;
-                    }
-                }
-
-                this.Result = alphas;
-            });
-        }
-
-        public void DoLinear()
-        {
-            List<CoordFunction> simpleFunctions = Functions.GetCoordFunctions();
-            List<CoordFunction> functions = Functions.GetOperatorCoordFunctions();
-            int count = functions.Count;
-            this.ActionsCount = count * count + count + 1; // nxn интегралов-левая часть, n интегралов-правая часть, 1-решение СЛАУ
-
-            this.Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
-            {
-
-                Task[] tasks = new Task[2];
-                List<double> rhs = new List<double>(functions.Count);
-
-                tasks[0] = Task.Factory.StartNew(() =>
-                {
-                    for (int i = 0; i < functions.Count; ++i)
-                    {
-                        function = simpleFunctions[i];
-                        rhs.Add(-Gauss.Integrate(makeRhs)); //минус-потому что потом переносим в правую часть системы 
-                        this.ReportProgress();
-                    }
-                });
-
-                double[,] lhs = new double[count, count];
-
-                tasks[1] = Task.Factory.StartNew(() =>
-                {
-                    for (int i = 0; i < count; ++i)
-                    {
-                        for (int j = 0; j < count; ++j)
-                        {
-                            currentI = simpleFunctions[i];
-                            currentJ = functions[j];
-                            lhs[i, j] = Gauss.Integrate(makeLhs);
-                            this.ReportProgress();
-                        }
-                    }
-                });
-
-                Task.WaitAll(tasks);
-
-
-                int info;
-                double[] alphas;
-                alglib.densesolverreport report;
-                alglib.rmatrixsolve(lhs, count, rhs.ToArray(), out info, out report, out alphas);
-                this.Progress++;
-                this.Worker.ReportProgress(this.Progress);
                 // Chop
                 for (int i = 0; i < count; ++i)
                 {
