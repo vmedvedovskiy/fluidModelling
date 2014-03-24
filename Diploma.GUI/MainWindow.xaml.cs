@@ -1,12 +1,13 @@
 ﻿
 namespace Diploma.GUI
 {
-    using System.Windows;
+    using Diploma.Functions;
     using Diploma.Managed;
-    using System.Linq;
+    using FuncLib.Functions;
     using System.ComponentModel;
     using System.Diagnostics;
-    using Diploma.Functions;
+    using System.Linq;
+    using System.Windows;
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -20,7 +21,11 @@ namespace Diploma.GUI
         public MainWindow()
         {
             this.Alghoritm = new Linear();
-            var cat = CoordinateFunctions.Construct();
+            var cat = CoordinateFunctions.Instance.Construct(4, 4);
+            var cat2 = ProjectionFunctions.Instance.Construct(4, 4);
+            Variable r = new Variable();
+            Variable theta = new Variable();
+            var cat3 = cat.Select(x => Operators.Instance.B(x, r, theta));
             InitializeComponent();
         }
 

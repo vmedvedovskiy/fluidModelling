@@ -2,78 +2,119 @@
 namespace Diploma.Functions
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+    using System.Collections.Generic;
     using FuncLib.Functions;
 
-    public class CoordinateFunctions
+    public class CoordinateFunctions: CoordinateFunctionsBase
     {
-        private Function psi0;
-        private Function omega;
+        #region Fields
 
-        public CoordinateFunctions()
-        {
-            this.CreatePsi0();
-        }
+        private static volatile CoordinateFunctions instance;
+        private static readonly Object syncRoot = new Object();
+        #endregion
 
-        public void InitPsi0(double U, double R)
-        {
-            Variable u = new Variable();
-            Variable r = new Variable();
-            this.psi0 = this.psi0.PartialValue(u | U, r | R);
-        }
+        #region Constructors
 
-        public void InitOmega(double a, double b)
-        {
-            Variable A = new Variable();
-            Variable B = new Variable();
-            this.omega = this.omega.PartialValue(A | a, B | b);
-        }
-
-        public static IList<Function> Construct(int m1, int m2)
+        private CoordinateFunctions()
         {
         }
 
-        private void CreatePsi0()
+        static CoordinateFunctions()
         {
-            Variable r = new Variable();
-            Variable th = new Variable();
-            Variable U = new Variable();
-            Variable R = new Variable();
-            this.psi0 = 0.25 * U * Function.Pow(r - R, 2) * (2 + (R / r)) *
-                Function.Pow(Function.Sin(th), 2);
+
         }
 
-        private void CreateOmega()
-        {
-            Variable r = new Variable();
-            Variable th = new Variable();
-            Variable a = new Variable();
-            Variable b = new Variable();
-            this.omega = ((Function.Pow(r, 2)) * Function.Pow(Function.Cos(th), 2)) / Function.Pow(a, 2) +
-                ((Function.Pow(r, 2)) * Function.Pow(Function.Sin(th), 2)) / Function.Pow(b, 2) - 1;
-        }
+        #endregion
 
-        private Function J(int n, Function x)
-        {
-            if (n == 0)
-                return 1;
-            if (n == 1)
-                return -x;
-            return -1 / fact(n - 1) * (Function.Pow((Function.Pow(x, 2) - 1) / 2, n - 1).Derivative(x, n - 2));
-        }
+        #region Properties
 
-        private double fact(int n)
+        public static CoordinateFunctions Instance
         {
-            double result = 1;
-            while (n > 1)
+            get
             {
-                result = result * n;
-                n--;
+                if (instance == null)
+                {
+                    lock (syncRoot)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new CoordinateFunctions();
+                        }
+                    }
+                }
+
+                return instance;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        protected override IList<Function> ConstructInternal(int m1, int m2, Variable r, Variable theta)
+        {
+            var omega2 = Function.Pow(this.omega, 2);
+            var omega3 = Function.Pow(this.omega, 2) * (1 - this.omega);
+            IList<Function> all = new List<Function>();
+            all = all
+                .Concat(this.F1(r, theta, m1).Select(x => omega2 * x))
+                .Concat(this.F2(r, theta, m2).Select(x => omega3 * x))
+                .ToList();
+            return all;
+        }
+
+        internal IList<Function> GetRawTau(int m1, int m2, Variable r, Variable theta)
+        {
+            this.omega = this.CreateOmega(r, theta);
+            this.psi0 = this.CreatePsi0(r, theta);
+            IList<Function> all = new List<Function>();
+            all = all
+                .Concat(this.F1(r, theta, m1))
+                .Concat(this.F2(r, theta, m2))
+                .ToList();
+            return all;
+        }
+
+        private IList<Function> F1(Variable r, Variable theta, int m1)
+        {
+            IList<Function> result = new List<Function>();
+            if (m1 % 2 != 0)
+            {
+                throw new ArgumentException("M1 must be even.");
+            }
+
+            int len = m1 / 2;
+            for (int i = 1; i <= len; ++i)
+            {
+                result.Add(Function.Pow(r, -i) * this.J(i + 1, Function.Cos(theta), theta));
+                result.Add(Function.Pow(r, -i) * this.J(i + 3, Function.Cos(theta), theta));
             }
 
             return result;
         }
+
+        private IList<Function> F2(Variable r, Variable theta, int m2)
+        {
+            IList<Function> result = new List<Function>();
+            result.Add(this.J(3, Function.Cos(theta), theta));
+            result.Add(r * this.J(2, Function.Cos(theta), theta));
+
+            if (m2 % 2 != 0)
+            {
+                throw new ArgumentException("M1 must be even.");
+            }
+
+            int len = (m2 - 2) /2 ;
+            for (int i = 1; i <= len; ++i)
+            {
+                result.Add(Function.Pow(r, i) * this.J(i, Function.Cos(theta), theta));
+                result.Add(Function.Pow(r, i + 2) * this.J(i, Function.Cos(theta), theta));
+            }
+
+            return result;
+        }
+
+        #endregion
     }
 }
