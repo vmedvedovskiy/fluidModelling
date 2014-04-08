@@ -13,9 +13,6 @@ namespace Diploma.Managed
     {
         #region Fields
 
-        private CoordFunction function;
-        private CoordFunction currentI;
-        private CoordFunction currentJ;
         private double eps = Math.Pow(10, -6);
 
         #endregion
@@ -62,7 +59,7 @@ namespace Diploma.Managed
                     task = Task.Factory.StartNew((function) =>
                     {
                         //минус-потому что потом переносим в правую часть системы 
-                        rhsDictionary[rhsDictionary.Where(x => x.Value == task.Id).First().Key] = -Gauss.Integrate((double ro, double phi,
+                        rhsDictionary[rhsDictionary.Where(x => x.Value == task.Id).First().Key] = -Integration.Integrate((double ro, double phi,
                             double a, double b, double m, double r, double uinf) =>
                         {
                             return Common.Instance.makeReplacement(ro, phi, GeneratedFunctions.f0) * Common.Instance.makeReplacement(ro, phi, (CoordFunction)function) * Common.Instance.jac(ro, phi);
@@ -94,7 +91,7 @@ namespace Diploma.Managed
                         task = Task.Factory.StartNew((functionsArray) =>
                         {
                             var list = functionsArray as List<CoordFunction>;
-                            tasksDictionary[task.Id] = Gauss.Integrate((double ro, double phi,
+                            tasksDictionary[task.Id] = Integration.Integrate((double ro, double phi,
                                 double a, double b, double m, double r, double uinf) =>
                             {
                                 return Common.Instance.makeReplacement(ro, phi, list[0]) * Common.Instance.makeReplacement(ro, phi, list[1]) * Common.Instance.jac(ro, phi);
@@ -134,16 +131,6 @@ namespace Diploma.Managed
         }
 
         #endregion
-
-        private double makeRhs(double ro, double phi, double a, double b, double m, double r, double uinf)
-        {
-            return Common.Instance.makeReplacement(ro, phi, GeneratedFunctions.f0) * Common.Instance.makeReplacement(ro, phi, function) * Common.Instance.jac(ro, phi);
-        }
-
-        private double makeLhs(double ro, double phi, double a, double b, double m, double r, double uinf)
-        {
-            return Common.Instance.makeReplacement(ro, phi, currentI) * Common.Instance.makeReplacement(ro, phi, currentJ) * Common.Instance.jac(ro, phi);
-        }
 
         private void ReportProgress()
         {

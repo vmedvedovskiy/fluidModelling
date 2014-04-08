@@ -38,7 +38,7 @@
         <Label Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right">Кол-во коорд. функций =</Label>
         <Label Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Content="30"></Label>
         <Label Grid.Row="7" Grid.Column="0" HorizontalAlignment="Right">Число точек для квадратур Гаусса</Label>
-        <Label Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NNGauss , Source={x:Static local:Common.Instance}}"></Label>
+        <TextBox Grid.Row="7" Name="NNGauss" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding NNGauss , Source={x:Static local:Common.Instance}}" Width="125"></TextBox>
         <ProgressBar Name="ProgressBar" Grid.ColumnSpan="2" Grid.Row="8" Height="20" Margin="5 ,5, 5, 5" Value="0" Minimum="0" Maximum="100"></ProgressBar>
         <Label Grid.Row="9" Grid.Column="0" HorizontalAlignment="Right" Content="Затраченное время:"></Label>
         <Label Name="time" Grid.Row="9" Grid.Column="1" HorizontalAlignment="Left"></Label>

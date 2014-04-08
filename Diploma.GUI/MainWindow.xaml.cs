@@ -21,11 +21,6 @@ namespace Diploma.GUI
         public MainWindow()
         {
             this.Alghoritm = new Linear();
-            var cat = CoordinateFunctions.Instance.Construct(4, 4);
-            var cat2 = ProjectionFunctions.Instance.Construct(4, 4);
-            Variable r = new Variable();
-            Variable theta = new Variable();
-            var cat3 = cat.Select(x => Operators.Instance.B(x, r, theta));
             InitializeComponent();
         }
 
@@ -62,6 +57,7 @@ namespace Diploma.GUI
             this.B.IsEnabled = false;
             this.R.IsEnabled = false;
             this.Uinf.IsEnabled = false;
+            this.NNGauss.IsEnabled = false;
         }
 
         private void EnableAll()
@@ -71,6 +67,7 @@ namespace Diploma.GUI
             this.B.IsEnabled = true;
             this.R.IsEnabled = true;
             this.Uinf.IsEnabled = true;
+            this.NNGauss.IsEnabled = true;
         }
     }
 }
