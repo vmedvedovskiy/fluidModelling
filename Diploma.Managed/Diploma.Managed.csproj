@@ -42,6 +42,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Assemblies\alglibnet2.dll</HintPath>
     </Reference>
+    <Reference Include="FuncLib">
+      <HintPath>..\Assemblies\FuncLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -62,6 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Diploma.Functions\Diploma.Functions.csproj">
+      <Project>{d0d14d2a-b171-44ff-b18b-0d3e3862c446}</Project>
+      <Name>Diploma.Functions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

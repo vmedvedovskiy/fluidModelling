@@ -16,11 +16,11 @@ namespace Diploma.GUI
         public string Result { get; set; }
         public int Min { get; set; }
         public int Max { get; set; }
-        public Linear Alghoritm { get; set; }
+        public Nonlinear Alghoritm { get; set; }
 
         public MainWindow()
         {
-            this.Alghoritm = new Linear();
+            this.Alghoritm = new Nonlinear();
             InitializeComponent();
         }
 

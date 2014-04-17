@@ -25,7 +25,7 @@
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Исходные данные:</Label>
         <Label Grid.Row="0" Grid.Column="1">Уравнение эллипсоида</Label>
-        <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">a = </Label>
+        <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">a =</Label>
         <TextBox Name="A" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="125" Text="{Binding A, Source={x:Static local:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
         <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right">b =</Label>
         <TextBox Name="B" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Width="125" Text="{Binding B, Source={x:Static local:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
@@ -36,7 +36,8 @@
         <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right">R =</Label>
         <TextBox Name="R" Grid.Row="5" Grid.Column="1" Width="125" HorizontalAlignment="Left" Text="{Binding R, Source={x:Static local:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
         <Label Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right">Кол-во коорд. функций =</Label>
-        <Label Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Content="30"></Label>
+        <TextBox Grid.Row="6" Name="M1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding M1 , Source={x:Static local:Common.Instance}}" Width="62.5"></TextBox>
+        <TextBox Grid.Row="6" Name="M2" Grid.Column="1"  HorizontalAlignment="Left" Text="{Binding M2 , Source={x:Static local:Common.Instance}}" Width="62" Margin="62.5,0,0,0"></TextBox>
         <Label Grid.Row="7" Grid.Column="0" HorizontalAlignment="Right">Число точек для квадратур Гаусса</Label>
         <TextBox Grid.Row="7" Name="NNGauss" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding NNGauss , Source={x:Static local:Common.Instance}}" Width="125"></TextBox>
         <ProgressBar Name="ProgressBar" Grid.ColumnSpan="2" Grid.Row="8" Height="20" Margin="5 ,5, 5, 5" Value="0" Minimum="0" Maximum="100"></ProgressBar>

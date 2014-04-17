@@ -52,7 +52,8 @@ namespace Diploma.Managed
             {
                 var rhsDictionary = new Dictionary<int, double>();
                 List<double> rhs = new List<double>(functions.Count);
-                List<Task> tasks = new List<Task>();
+                List<Task> tasks = new List<Task>(this.ActionsCount);
+
                 foreach (CoordFunction func in simpleFunctions)
                 {
                     Task task = null;
@@ -62,7 +63,7 @@ namespace Diploma.Managed
                         rhsDictionary[rhsDictionary.Where(x => x.Value == task.Id).First().Key] = -Integration.Integrate((double ro, double phi,
                             double a, double b, double m, double r, double uinf) =>
                         {
-                            return Common.Instance.makeReplacement(ro, phi, GeneratedFunctions.f0) * Common.Instance.makeReplacement(ro, phi, (CoordFunction)function) * Common.Instance.jac(ro, phi);
+                            return Common.Instance.MakeReplacement(ro, phi, GeneratedFunctions.f0) * Common.Instance.MakeReplacement(ro, phi, (CoordFunction)function) * Common.Instance.Jacobian(ro, phi);
                         });
                         this.ReportProgress();
                     }, func, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
@@ -94,7 +95,7 @@ namespace Diploma.Managed
                             tasksDictionary[task.Id] = Integration.Integrate((double ro, double phi,
                                 double a, double b, double m, double r, double uinf) =>
                             {
-                                return Common.Instance.makeReplacement(ro, phi, list[0]) * Common.Instance.makeReplacement(ro, phi, list[1]) * Common.Instance.jac(ro, phi);
+                                return Common.Instance.MakeReplacement(ro, phi, list[0]) * Common.Instance.MakeReplacement(ro, phi, list[1]) * Common.Instance.Jacobian(ro, phi);
                             });
                             this.ReportProgress();
                         }, new List<CoordFunction>() { funcI, funcJ }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);

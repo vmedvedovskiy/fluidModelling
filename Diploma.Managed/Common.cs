@@ -37,6 +37,8 @@ namespace Diploma.Managed
         private double uinf = 1;
         private double r = 0;
         private int nNGauss = 50;
+        private int m1 = 10;
+        private int m2 = 10;
 
         private static volatile Common instance;
         private static object syncRoot = new Object();
@@ -165,19 +167,52 @@ namespace Diploma.Managed
             }
         }
 
+        public int M1
+        {
+            get
+            {
+                return this.m1;
+            }
+            set
+            {
+                int result;
+                if (int.TryParse(value.ToString(), out result))
+                {
+                    m1 = result;
+                    this.OnPropertyChanged("M1");
+                }
+            }
+        }
+
+        public int M2
+        {
+            get
+            {
+                return this.m2;
+            }
+            set
+            {
+                int result;
+                if (int.TryParse(value.ToString(), out result))
+                {
+                    m2 = result;
+                    this.OnPropertyChanged("M2");
+                }
+            }
+        }
         
         #endregion
 
         #region Methods
 
-        public double omega(double r, double th)
+        public double Omega(double r, double th)
         {
             return (Math.Pow(r, 2) * Math.Pow(Math.Cos(th), 2)) / Math.Pow(a, 2) + (Math.Pow(r, 2) * Math.Pow(Math.Sin(th), 2)) / Math.Pow(b, 2) - 1.0;
         }
 
-        public double w(double r, double th)
+        public double W(double r, double th)
         {
-            var result = 1.0 - Math.Exp((M * omega(r, th)) / (omega(r, th) - M));
+            var result = 1.0 - Math.Exp((M * Omega(r, th)) / (Omega(r, th) - M));
             if (result > 1)
             {
                 Debugger.Break();
@@ -186,18 +221,18 @@ namespace Diploma.Managed
             return result;
         }
 
-        public double psi0(double r, double th)
+        public double Psi0(double r, double th)
         {
             return 0.25 * (Uinf * Math.Pow(r - R, 2) * (2 + R / r) * Math.Pow(Math.Sin(th), 2));
         }
 
-        public double makeReplacement(double ro, double phi, CoordFunction target)
+        public double MakeReplacement(double ro, double phi, CoordFunction target)
         {
             return target(ro * Math.Sqrt(Math.Pow(a, 2) * Math.Pow(Math.Cos(phi), 2) + Math.Pow(b, 2) * Math.Pow(Math.Sin(phi), 2)), Math.Atan2(b * Math.Sin(phi), a * Math.Cos(phi))
                 ,Common.Instance.A, Common.Instance.B, Common.Instance.M, Common.Instance.R, Common.Instance.Uinf);
         }
 
-        public double jac(double ro, double phi)
+        public double Jacobian(double ro, double phi)
         {
             return a * b * ro * Math.Pow(Math.Cos(phi), 2) + a * b * ro * Math.Pow(Math.Sin(phi), 2);
         } 
