@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using Diploma.Functions;
     using FuncLib.Functions;
+    using FuncLib.Functions.Compilation;
 
     public class Nonlinear
     {
@@ -44,9 +45,23 @@
         {
             Variable r = new Variable();
             Variable th = new Variable();
-            var coordFuncs = new CoordinateFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
-            var projectionFuncs = new ProjectionFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
+            
 
+            var coordFuncs = new CoordinateFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
+            // Compile to IL code using the variables given.
+
+            var _jacobian = new Jacobian();
+            IList<CompiledFunction> cfs = new List<CompiledFunction>();
+            IList<double> vals = new List<Double>();
+            foreach (var cat in coordFuncs)
+            {
+                var j = new Jacobian();
+                var composition = cat.Compose(j);
+                vals.Add(Integration.Integrate(composition));
+                cfs.Add(Compiler.Compile(composition.Expression, composition.R, composition.Th));
+            }
+
+            vals = vals.Distinct<double>().ToList();
         }
 
         #endregion
@@ -57,4 +72,16 @@
             this.Worker.ReportProgress(this.Progress);
         }
     }
+
+    internal class Jacobian : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            var a = Common.Instance.A;
+            var b = Common.Instance.B;
+            return a * b * r * Function.Pow(Function.Cos(th), 2)
+                        + a * b * r * Function.Pow(Function.Sin(th), 2);
+        }
+    }
+
 }

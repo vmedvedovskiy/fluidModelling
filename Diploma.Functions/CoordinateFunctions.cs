@@ -1,43 +1,45 @@
 ﻿
 namespace Diploma.Functions
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
     using FuncLib.Functions;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
-    public class CoordinateFunctions: CoordinateFunctionsBase
+    public class CoordinateFunctions
     {
 
         #region Methods
 
-        protected override IList<Function> ConstructInternal(int m1, int m2, Variable r, Variable theta)
+        public IList<IVariabledFunction> Construct(int m1, int m2)
         {
-            var omega2 = Function.Pow(omega, 2);
-            var omega3 = Function.Pow(omega, 2) * (1 - omega);
-            IList<Function> all = new List<Function>();
+            var all = new List<IVariabledFunction>();
             all = all
-                .Concat(F1(r, theta, m1).Select(x => omega2 * x))
-                .Concat(F2(r, theta, m2).Select(x => omega3 * x))
+                .Concat(F1(m1).Select(x => {
+                    var omega2 = new Omega2();
+                    return x.Compose(omega2);
+                }))
+                .Concat(F2(m2).Select(x => {
+                    var omega3 = new Omega3();
+                    return x.Compose(omega3);
+                }))
                 .ToList();
             return all;
         }
 
         internal static IList<Function> GetRawTau(int m1, int m2, Variable r, Variable theta)
         {
-            omega = CreateOmega(r, theta);
-            psi0 = CreatePsi0(r, theta);
             IList<Function> all = new List<Function>();
-            all = all
-                .Concat(F1(r, theta, m1))
-                .Concat(F2(r, theta, m2))
-                .ToList();
+            //all = all
+            //    .Concat(F1(r, theta, m1))
+            //    .Concat(F2(r, theta, m2))
+            //    .ToList();
             return all;
         }
 
-        private static IList<Function> F1(Variable r, Variable theta, int m1)
+        private static IList<VariabledFunction> F1(int m1)
         {
-            IList<Function> result = new List<Function>();
+            IList<VariabledFunction> result = new List<VariabledFunction>();
             if (m1 % 2 != 0)
             {
                 throw new ArgumentException("M1 must be even.");
@@ -46,18 +48,18 @@ namespace Diploma.Functions
             int len = m1 / 2;
             for (int i = 1; i <= len; ++i)
             {
-                result.Add(Function.Pow(r, -i) * J(i + 1, Function.Cos(theta), theta));
-                result.Add(Function.Pow(r, -i) * J(i + 3, Function.Cos(theta), theta));
+                result.Add(new F(-i, i + 1));
+                result.Add(new F(-i, i + 3));
             }
 
             return result;
         }
 
-        private static IList<Function> F2(Variable r, Variable theta, int m2)
+        private static IList<VariabledFunction> F2(int m2)
         {
-            IList<Function> result = new List<Function>();
-            result.Add(J(3, Function.Cos(theta), theta));
-            result.Add(r * J(2, Function.Cos(theta), theta));
+            IList<VariabledFunction> result = new List<VariabledFunction>();
+            result.Add(new F2_1());
+            result.Add(new F2_2());
 
             if (m2 % 2 != 0)
             {
@@ -67,8 +69,8 @@ namespace Diploma.Functions
             int len = (m2 - 2) /2 ;
             for (int i = 1; i <= len; ++i)
             {
-                result.Add(Function.Pow(r, i) * J(i, Function.Cos(theta), theta));
-                result.Add(Function.Pow(r, i + 2) * J(i, Function.Cos(theta), theta));
+                result.Add(new F(i, i));
+                result.Add(new F(i + 2, i));
             }
 
             return result;
@@ -76,4 +78,57 @@ namespace Diploma.Functions
 
         #endregion
     }
+
+    internal class F : VariabledFunction
+    {
+        private int pow;
+        private int j;
+
+        public F(int pow, int j)
+            :base()
+        {
+            this.pow = pow;
+            this.j = j;
+        }
+
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            return Function.Pow(r, this.pow) * Common.Instance.J(this.j, Function.Cos(th), th);
+        }
+    }
+
+    internal class Omega2 : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            var omega = new Omega();
+            return Function.Pow(omega.GetExpression(r, th), 2);
+        }
+    }
+
+    internal class Omega3 : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            var omega = new Omega();
+            return Function.Pow(omega.GetExpression(r, th), 2) * (1 - omega.GetExpression(r, th));
+        }
+    }
+
+    internal class F2_1 : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            return Common.Instance.J(3, Function.Cos(th), th);
+        }
+    }
+
+    internal class F2_2 : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            return r * Common.Instance.J(2, Function.Cos(th), th);
+        }
+    }
+
 }
