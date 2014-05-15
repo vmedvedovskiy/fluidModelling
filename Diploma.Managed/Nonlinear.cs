@@ -47,21 +47,25 @@
             Variable th = new Variable();
             
 
-            var coordFuncs = new CoordinateFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
+            var phi = new CoordinateFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
+            var f = new CoordinateFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
+            var count = Common.Instance.M1 + Common.Instance.M2;
+            var u = new U(count);
             // Compile to IL code using the variables given.
 
-            var _jacobian = new Jacobian();
-            IList<CompiledFunction> cfs = new List<CompiledFunction>();
             IList<double> vals = new List<Double>();
-            foreach (var cat in coordFuncs)
+
+            var B = new B();
+            var j = new Jacobian();
+
+            foreach (var cat in phi)
             {
-                var j = new Jacobian();
-                var composition = cat.Compose(j);
-                vals.Add(Integration.Integrate(composition));
-                cfs.Add(Compiler.Compile(composition.Expression, composition.R, composition.Th));
+                vals.Add(Integration.Integrate(Compiler.Compile(B.Apply(cat.GetExpression(cat.R, cat.Th), cat.R, cat.Th) * j.GetExpression(cat.R, cat.Th), cat.R, cat.Th)));
             }
 
             vals = vals.Distinct<double>().ToList();
+            var rp = this.GetRightPartAsync(count, f, u);
+            rp = rp.Distinct<double>().ToArray();
         }
 
         #endregion
@@ -71,17 +75,20 @@
             this.Progress++;
             this.Worker.ReportProgress(this.Progress);
         }
-    }
 
-    internal class Jacobian : VariabledFunction
-    {
-        public override Function GetExpression(Variable r, Variable th)
+        private double[] GetRightPartAsync(int count, IList<IVariabledFunction> f, IVariabledFunction u)
         {
-            var a = Common.Instance.A;
-            var b = Common.Instance.B;
-            return a * b * r * Function.Pow(Function.Cos(th), 2)
-                        + a * b * r * Function.Pow(Function.Sin(th), 2);
+            var result = new double[count];
+            var fo = new FOperator();
+            var fApplied = fo.Apply(u.GetExpression(u.R, u.Th), u.R, u.Th);
+            for (var i = 0; i < count; ++i)
+            {
+                var @int = Integration.Integrate(Compiler.Compile(f[i].GetExpression(u.R, u.Th) * fApplied));
+                result[i] = @int;
+            }
+
+            return result;
+
         }
     }
-
 }

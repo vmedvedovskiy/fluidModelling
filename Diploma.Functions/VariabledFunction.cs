@@ -29,7 +29,6 @@
         {
             this.r = new Variable();
             this.th = new Variable();
-            this.expression = this.GetExpression(this.r, this.th);
         }
 
         public Variable R
@@ -52,6 +51,11 @@
         {
             get
             {
+                if (this.expression == null)
+                {
+                    this.expression = this.GetExpression(this.r, this.th);
+                }
+
                 return this.expression;
             }
         }
@@ -69,10 +73,10 @@
             {
                 R = this.r,
                 Th = this.th,
-                Expression = this.expression * another.GetExpression(this.r, this.th),
+                expression = this.GetExpression(this.r, this.th) * another.GetExpression(this.r, this.th),
                 GetExpression = Return<Function>.Arguments<Variable, Variable>((r, th) =>
                 {
-                    return this.GetExpression(r, th);
+                    return this.GetExpression(r, th) * another.GetExpression(r, th);
                 }),
                 Compose = Return<IVariabledFunction>.Arguments<IVariabledFunction>((f) =>
                 {
@@ -80,7 +84,7 @@
                 }),
                 Value = Return<double>.Arguments<double, double>((r, th) =>
                 {
-                    return this.Expression.Value(this.r | r, this.th | th);
+                    return this.Value(r, th);
                 }),
 
             }.ActLike<IVariabledFunction>();

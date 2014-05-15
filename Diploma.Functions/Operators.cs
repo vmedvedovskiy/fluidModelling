@@ -30,20 +30,26 @@ namespace Diploma.Functions
 
     public class B : BaseOperator
     {
-
-        private static Function Cot(Variable a)
-        {
-            return Function.Cos(a) / Function.Sin(a);
-        }
-
         public override Function Apply(Function f, Variable r, Variable th)
         {
             var e = new E();
  	        return ((1 / (Function.Pow(r, 2) * Function.Sin(th))) *
                 (f.Derivative(th, 1) * e.Apply(f, r, th).Derivative(r, 1)
                     - f.Derivative(r, 1) * e.Apply(f, r, th).Derivative(th, 1))
-                + (1 / (Function.Pow(r, 2) * Function.Sin(th))) * (2 * Cot(th) * f.Derivative(r, 1)
+                + (1 / (Function.Pow(r, 2) * Function.Sin(th))) * (2 * Common.Cot(th) * f.Derivative(r, 1)
                     - 2 / r * f.Derivative(th))) * e.Apply(f, r, th);
+        }
+    }
+
+    public class FOperator: BaseOperator
+    {
+        public override Function Apply(Function f, Variable r, Variable th)
+        {
+            var e = new E();
+            var b = new B();
+
+            return b.Apply(f, r, th) + Common.Instance.Uinf * Function.Cos(th) * e.Apply(f, r, th).Derivative(r)
+                 - Common.Instance.Uinf * Function.Sin(th) * e.Apply(f, r, th).Derivative(th);
         }
     }
 }

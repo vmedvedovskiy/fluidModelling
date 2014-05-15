@@ -5,6 +5,7 @@ namespace Diploma.Functions
     using System.Diagnostics;
     using System.ComponentModel;
     using FuncLib.Functions;
+    using System.Linq;
 
     public class Common: INotifyPropertyChanged
     {
@@ -234,7 +235,7 @@ namespace Diploma.Functions
             }
             else
             {
-                result = -1 / this.fact(n - 1)
+                result = -1 / fact(n - 1)
                     * (Function.Pow((Function.Pow(r, 2) - 1) / 2, n - 1).Derivative(v, n - 2));
             }
 
@@ -253,6 +254,53 @@ namespace Diploma.Functions
             return result;
         }
 
+        public static Function Cot(Variable x)
+        {
+            return Function.Cos(x) / Function.Sin(x);
+        }
+
         #endregion
+    }
+
+    public class Omega : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            var omega = ((Function.Pow(r, 2)) * Function.Pow(Function.Cos(th), 2)) / Function.Pow(Common.Instance.A, 2) +
+                    ((Function.Pow(r, 2)) * Function.Pow(Function.Sin(th), 2)) / Function.Pow(Common.Instance.B, 2) - 1;
+
+            return 1 - Function.Exp(Common.Instance.M * omega / (omega - Common.Instance.M));
+        }
+    }
+
+    public class U : VariabledFunction
+    {
+        private double[] alpha;
+
+        public U(int count)
+        {
+            this.alpha = new double[count];
+            for (int i = 0; i < count; ++i)
+            {
+                this.alpha[i] = 0;
+            }
+        }
+
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            var o2 = new Omega2();
+            var o3 = new Omega3();
+            var f1 = CoordinateFunctionsBase.F1(Common.Instance.M1);
+            var f2 = CoordinateFunctionsBase.F2(Common.Instance.M2);
+
+
+            return Function.Sum(f1.Select(x => {
+                return this.alpha[f1.IndexOf(x)] * x.GetExpression(r, th) * o2.GetExpression(r, th);
+            }).ToArray())
+                + Function.Sum(f2.Select(x => {
+                    return this.alpha[Common.Instance.M1 + f2.IndexOf(x)] * x.GetExpression(r, th) * o3.GetExpression(r, th);
+                }).ToArray());
+
+        }
     }
 }

@@ -4,22 +4,29 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ProjectionFunction
+    public class ProjectionFunction : CoordinateFunctionsBase
     {
 
-        //public ProjectionFunction
-        //#region Methods
+        public IList<IVariabledFunction> Construct(int m1, int m2)
+        {
+            // IList<double> vals = new List<Double>();
 
-        //protected override IList<Function> ConstructInternal(int m1, int m2, Variable r, Variable theta)
-        //{
-        //    return CoordinateFunctions.GetRawTau(m1, m2, r, theta)
-        //        .Select(x =>
-        //        {
-        //            var omega = new Omega();
-        //            return Function.Pow(omega.GetExpression(r, theta), 2) * x;
-        //        })
-        //        .ToList();
-                
-        //}
+            var all = new List<IVariabledFunction>();
+            all = all
+                .Concat(F1(m1).Select(x =>
+                {
+                    var omega2 = new Omega2();
+                    // vals.Add(Integration.Integrate(Compiler.Compile(x.GetExpression(x.R, x.Th) * omega2.GetExpression(x.R, x.Th), x.R, x.Th)));
+                    return x.Compose(omega2);
+                }))
+                .Concat(F2(m2).Select(x =>
+                {
+                    var omega2 = new Omega3();
+                    // vals.Add(Integration.Integrate(Compiler.Compile(x.GetExpression(x.R, x.Th) * omega3.GetExpression(x.R, x.Th), x.R, x.Th)));
+                    return x.Compose(omega2);
+                }))
+                .ToList();
+            return all;
+        }
     }
 }
