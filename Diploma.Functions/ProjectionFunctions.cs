@@ -21,7 +21,7 @@
                 }))
                 .Concat(F2(m2).Select(x =>
                 {
-                    var omega2 = new Omega3();
+                    var omega2 = new Omega2();
                     // vals.Add(Integration.Integrate(Compiler.Compile(x.GetExpression(x.R, x.Th) * omega3.GetExpression(x.R, x.Th), x.R, x.Th)));
                     return x.Compose(omega2);
                 }))
