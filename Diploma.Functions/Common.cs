@@ -6,6 +6,7 @@ namespace Diploma.Functions
     using System.ComponentModel;
     using FuncLib.Functions;
     using System.Linq;
+    using FuncLib.Functions.Compilation;
 
     public class Common: INotifyPropertyChanged
     {
@@ -36,8 +37,8 @@ namespace Diploma.Functions
         private double uinf = 1;
         private double r = 0;
         private int nNGauss = 50;
-        private int m1 = 10;
-        private int m2 = 10;
+        private int m1 = 8;
+        private int m2 = 8;
         private Function _jacobian;
 
         private static volatile Common instance;
@@ -292,15 +293,20 @@ namespace Diploma.Functions
             var o3 = new Omega3();
             var f1 = CoordinateFunctionsBase.F1(Common.Instance.M1);
             var f2 = CoordinateFunctionsBase.F2(Common.Instance.M2);
+            var result = new ConstantFunction(0) as Function;
 
+            int i = 0;
+            for (; i < f1.Count; i++ )
+            {
+                result = result + this.alpha[i] * f1[i].GetExpression(r, th) * o2.GetExpression(r, th);
+            }
 
-            return Function.Sum(f1.Select(x => {
-                return this.alpha[f1.IndexOf(x)] * x.GetExpression(r, th) * o2.GetExpression(r, th);
-            }).ToArray())
-                + Function.Sum(f2.Select(x => {
-                    return this.alpha[Common.Instance.M1 + f2.IndexOf(x)] * x.GetExpression(r, th) * o3.GetExpression(r, th);
-                }).ToArray());
+            for (int j = 0; j < f2.Count; j++)
+            {
+                result = result + this.alpha[j + i] * f2[j].GetExpression(r, th) * o3.GetExpression(r, th);
+            }
 
+            return result;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace Diploma.Functions
 {
-    using FuncLib.Functions;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -9,7 +8,7 @@
 
         public IList<IVariabledFunction> Construct(int m1, int m2)
         {
-            // IList<double> vals = new List<Double>();
+            // IList<double> vals = new List<double>();
 
             var all = new List<IVariabledFunction>();
             all = all
@@ -22,7 +21,7 @@
                 .Concat(F2(m2).Select(x =>
                 {
                     var omega2 = new Omega2();
-                    // vals.Add(Integration.Integrate(Compiler.Compile(x.GetExpression(x.R, x.Th) * omega3.GetExpression(x.R, x.Th), x.R, x.Th)));
+                    // vals.Add(Integration.Integrate(Compiler.Compile(x.GetExpression(x.R, x.Th) * omega2.GetExpression(x.R, x.Th), x.R, x.Th)));
                     return x.Compose(omega2);
                 }))
                 .ToList();

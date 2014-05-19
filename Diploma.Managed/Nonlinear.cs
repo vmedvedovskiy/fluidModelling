@@ -53,14 +53,16 @@
             var u = new U(count);
             // Compile to IL code using the variables given.
 
-            IList<double> vals = new List<Double>();
+            var e2 = new FOperator().Apply(new Omega().GetExpression(r, th), r, th).Value(r | 1, th | 1);
 
-            var B = new B();
-            var j = new Jacobian();
-
-            vals = vals.Distinct<double>().ToList();
             var rp = this.GetRightPartAsync(count, f, u);
             var lp = this.GetLeftPartAsync(count, f, phi);
+
+            int info;
+            double[] alphas;
+            alglib.densesolverreport report;
+            alglib.rmatrixsolve(lp, count, rp, out info, out report, out alphas);
+            report = report;
         }
 
         #endregion
@@ -75,11 +77,14 @@
         {
             var result = new double[count];
             var fo = new FOperator();
-            var fApplied = fo.Apply(u.GetExpression(u.R, u.Th), u.R, u.Th);
+            var r = new Variable();
+            var th = new Variable();
+            var j = new Jacobian().GetExpression(r, th);
+            var fApplied = fo.Apply(u.GetExpression(r, th), r, th);
             for (var i = 0; i < count; ++i)
             {
-                var @int = Integration.Integrate(Compiler.Compile(f[i].GetExpression(u.R, u.Th) * fApplied, u.R, u.Th));
-                result[i] = @int;
+                var @int = Integration.Integrate(Compiler.Compile(j * f[i].GetExpression(r, th) * fApplied, r, th));
+                result[i] = Common.Instance.R * @int;
             }
 
             return result;
@@ -90,13 +95,16 @@
         {
             var result = new double[count, count];
             var e2 = new E2();
+            var r = new Variable();
+            var th = new Variable();
+            var jac = new Jacobian().GetExpression(r, th);
             for (var i = 0; i < count; ++i)
             {
+                var fe = f[i].GetExpression(r, th);
                 for (var j = 0; j < count; ++j)
                 {
-                    var e2phi = e2.Apply(phi[j].GetExpression(phi[j].R, phi[j].Th), phi[j].R, phi[j].Th);
-                    var fe = f[i].GetExpression(phi[j].R, phi[j].Th);
-                    var @int = Integration.Integrate(Compiler.Compile(e2phi * fe, phi[j].R, phi[j].Th));
+                    var e2phi = e2.Apply(phi[j].GetExpression(r, th), r, th);
+                    var @int = Integration.Integrate(Compiler.Compile(e2phi * fe * jac, r, th));
                     result[i, j] = @int;
                 }
             }

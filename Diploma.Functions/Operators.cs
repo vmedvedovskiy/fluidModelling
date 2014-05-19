@@ -33,11 +33,11 @@ namespace Diploma.Functions
         public override Function Apply(Function f, Variable r, Variable th)
         {
             var e = new E();
- 	        return ((1 / (Function.Pow(r, 2) * Function.Sin(th))) *
+ 	        return ( 1 / (Function.Pow(r, 2) * Function.Sin(th))) *
                 (f.Derivative(th, 1) * e.Apply(f, r, th).Derivative(r, 1)
                     - f.Derivative(r, 1) * e.Apply(f, r, th).Derivative(th, 1))
                 + (1 / (Function.Pow(r, 2) * Function.Sin(th))) * (2 * Common.Cot(th) * f.Derivative(r, 1)
-                    - 2 / r * f.Derivative(th))) * e.Apply(f, r, th);
+                    - 2 * f.Derivative(th) / r) * e.Apply(f, r, th);
         }
     }
 
@@ -49,7 +49,7 @@ namespace Diploma.Functions
             var b = new B();
 
             return b.Apply(f, r, th) + Common.Instance.Uinf * Function.Cos(th) * e.Apply(f, r, th).Derivative(r)
-                 - Common.Instance.Uinf * Function.Sin(th) * e.Apply(f, r, th).Derivative(th);
+                 - Common.Instance.Uinf * (Function.Sin(th) / r) * e.Apply(f, r, th).Derivative(th);
         }
     }
 }
