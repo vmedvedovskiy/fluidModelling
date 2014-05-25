@@ -280,5 +280,15 @@ namespace Diploma.Functions
 
             return result;
         }
+
+        public void SetAlphas(double[] newAlphas)
+        {
+            if (newAlphas.Length != this.alpha.Length)
+            {
+                throw new ArgumentException("Length of alphas array must match");
+            }
+
+            this.alpha = newAlphas;
+        }
     }
 }

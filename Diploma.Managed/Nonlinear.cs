@@ -1,28 +1,41 @@
 ﻿namespace Diploma.Managed
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Diploma.Functions;
     using FuncLib.Functions;
     using FuncLib.Functions.Compilation;
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+
+    public class IterationCompletedArgs
+    {
+        public double[] Alphas { get; private set; }
+
+        public int Number { get; private set; }
+
+        public IterationCompletedArgs(double[] alphas, int number)
+        {
+            this.Alphas = alphas;
+            this.Number = number;
+        }
+    }
 
     public class Nonlinear
     {
 
         #region Fields
         private double eps = Math.Pow(10, -6);
+        private int iterationProgress;
+        private int iterationsCount;
+        private int actionsCount; 
+
+        public delegate void IterationCompletedHandler(object sender, IterationCompletedArgs e);
+        public event IterationCompletedHandler IterationCompleted;
 
         #endregion
 
         #region Properties
 
-        public double[] Result { get; set; }
-        public int ActionsCount { get; set; }
-        public int Progress { get; set; }
         public BackgroundWorker Worker { get; set; }
 
         #endregion
@@ -34,44 +47,54 @@
             this.Worker = new BackgroundWorker();
             this.Worker.WorkerReportsProgress = true;
             this.Worker.WorkerSupportsCancellation = true;
-            this.Result = new double[0];
+            this.Prepare();
         }
 
         #endregion
 
         #region Methods
 
-        public void Compute()
+        protected void Prepare()
         {
             Variable r = new Variable();
             Variable th = new Variable();
-            
 
             var f = new ProjectionFunction().Construct(r, th);
             var phi = new CoordinateFunctions().Construct(r, th);
             var count = phi.Count;
-            var u = new U(count).GetExpression(r, th);
-            // Compile to IL code using the variables given.
+            var u = new U(count);
+            double[,] lp = null;
+            this.Worker.DoWork += (sender, e) =>
+            {
+                while (this.iterationsCount < 10)
+                {
+                    if (lp == null)
+                    {
+                        this.actionsCount = count * count + count;
+                        lp = this.GetLeftPartAsync(count, f, phi, r, th);
+                    }
 
-            // var e2 = new FOperator().Apply(new Omega().GetExpression(r, th), r, th).Value(r | 1, th | 1);
+                    DoIteration(lp, r, th, f, count, u);
+                }
+            };
+        }
 
-            var rp = this.GetRightPartAsync(count, f, u, r, th);
-            var lp = this.GetLeftPartAsync(count, f, phi, r, th);
+        private void DoIteration(double[,] lp, Variable r, Variable th, IList<Function> f, int count, U u)
+        {
+            this.actionsCount = count;
+
+            var uf = u.GetExpression(r, th);
+            var rp = this.GetRightPartAsync(count, f, uf, r, th);
 
             int info;
             double[] alphas;
             alglib.densesolverreport report;
             alglib.rmatrixsolve(lp, count, rp, out info, out report, out alphas);
-            report = report;
+
+            this.OnIterationCompleted(alphas, this.iterationsCount);
         }
 
         #endregion
-
-        private void ReportProgress()
-        {
-            this.Progress++;
-            this.Worker.ReportProgress(this.Progress);
-        }
 
         private double[] GetRightPartAsync(int count, IList<Function> f, Function u, Variable r, Variable th)
         {
@@ -81,6 +104,7 @@
             var fApplied = fo.Apply(u, r, th);
             for (var i = 0; i < count; ++i)
             {
+                this.ReportProgress();
                 result[i] = Integration.Integrate(Compiler.Compile(f[i] * fApplied, r, th));
             }
 
@@ -98,6 +122,7 @@
                 var fe = f[i];
                 for (var j = 0; j < count; ++j)
                 {
+                    this.ReportProgress();
                     var e2phi = e2.Apply(phi[j], r, th);
                     var @int = Integration.Integrate(Compiler.Compile(e2phi * fe, r, th));
                     result[i, j] = @int;
@@ -106,6 +131,29 @@
 
             return result;
 
+        }
+
+        private void ReportProgress()
+        {
+            this.Worker.ReportProgress(100 * this.iterationProgress++ / this.actionsCount);
+        }
+
+        protected virtual void OnIterationCompleted(double[] alphas, int i)
+        {
+            this.iterationProgress = 0;
+            if (IterationCompleted != null)
+            {
+                try
+                {
+                    IterationCompleted(this, new IterationCompletedArgs(alphas, i));
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+
+            this.iterationsCount++;
         }
     }
 }
