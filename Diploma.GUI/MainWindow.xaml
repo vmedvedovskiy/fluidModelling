@@ -47,7 +47,7 @@
             <Button Grid.Row="10"  Height="25" Width="50" Grid.Column="0" HorizontalAlignment="Center" Name="BeginIteration" Click="Button_Click">Расчёт</Button>
             
         </Grid>
-        <WrapPanel Name="ButtonsPanel">
+        <WrapPanel Width="120" Name="ButtonsPanel">
         </WrapPanel>
     </StackPanel>
 </Window>

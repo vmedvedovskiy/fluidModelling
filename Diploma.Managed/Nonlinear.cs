@@ -66,7 +66,7 @@
             double[,] lp = null;
             this.Worker.DoWork += (sender, e) =>
             {
-                while (this.iterationsCount < 10)
+                while (this.iterationsCount < 20)
                 {
                     if (lp == null)
                     {
@@ -138,7 +138,7 @@
             this.Worker.ReportProgress(100 * this.iterationProgress++ / this.actionsCount);
         }
 
-        protected virtual void OnIterationCompleted(double[] alphas, int i)
+        private void OnIterationCompleted(double[] alphas, int i)
         {
             this.iterationProgress = 0;
             if (IterationCompleted != null)
