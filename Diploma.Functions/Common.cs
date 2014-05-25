@@ -1,12 +1,9 @@
 ﻿
 namespace Diploma.Functions
 {
-    using System;
-    using System.Diagnostics;
-    using System.ComponentModel;
     using FuncLib.Functions;
-    using System.Linq;
-    using FuncLib.Functions.Compilation;
+    using System;
+    using System.ComponentModel;
 
     public class Common: INotifyPropertyChanged
     {
@@ -35,10 +32,9 @@ namespace Diploma.Functions
         private double b = 1;
         private double m = 2;
         private double uinf = 1;
-        private double r = 0;
+        private double r = 1;
         private int nNGauss = 50;
-        private int m1 = 8;
-        private int m2 = 8;
+        private int n = 5;
         private Function _jacobian;
 
         private static volatile Common instance;
@@ -168,36 +164,19 @@ namespace Diploma.Functions
             }
         }
 
-        public int M1
+        public int N
         {
             get
             {
-                return this.m1;
+                return this.n;
             }
             set
             {
                 int result;
                 if (int.TryParse(value.ToString(), out result))
                 {
-                    m1 = result;
-                    this.OnPropertyChanged("M1");
-                }
-            }
-        }
-
-        public int M2
-        {
-            get
-            {
-                return this.m2;
-            }
-            set
-            {
-                int result;
-                if (int.TryParse(value.ToString(), out result))
-                {
-                    m2 = result;
-                    this.OnPropertyChanged("M2");
+                    n = result;
+                    this.OnPropertyChanged("N");
                 }
             }
         }
@@ -232,11 +211,11 @@ namespace Diploma.Functions
             }
             else if (n == 1)
             {
-                result = -v;
+                result = -r;
             }
             else
             {
-                result = -1 / fact(n - 1)
+                result = (-1 / fact(n - 1))
                     * (Function.Pow((Function.Pow(r, 2) - 1) / 2, n - 1).Derivative(v, n - 2));
             }
 
@@ -290,20 +269,13 @@ namespace Diploma.Functions
         public override Function GetExpression(Variable r, Variable th)
         {
             var o2 = new Omega2();
-            var o3 = new Omega3();
-            var f1 = CoordinateFunctionsBase.F1(Common.Instance.M1);
-            var f2 = CoordinateFunctionsBase.F2(Common.Instance.M2);
+            var cfs = new CoordinateFunctions().Construct(r, th);
             var result = new ConstantFunction(0) as Function;
 
             int i = 0;
-            for (; i < f1.Count; i++ )
+            for (; i < cfs.Count; i++)
             {
-                result = result + this.alpha[i] * f1[i].GetExpression(r, th) * o2.GetExpression(r, th);
-            }
-
-            for (int j = 0; j < f2.Count; j++)
-            {
-                result = result + this.alpha[j + i] * f2[j].GetExpression(r, th) * o3.GetExpression(r, th);
+                result = result + this.alpha[i] * cfs[i];
             }
 
             return result;

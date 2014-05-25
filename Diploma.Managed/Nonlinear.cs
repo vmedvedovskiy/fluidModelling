@@ -47,16 +47,16 @@
             Variable th = new Variable();
             
 
-            var f = new ProjectionFunction().Construct(Common.Instance.M1, Common.Instance.M2);
-            var phi = new CoordinateFunctions().Construct(Common.Instance.M1, Common.Instance.M2);
-            var count = Common.Instance.M1 + Common.Instance.M2;
-            var u = new U(count);
+            var f = new ProjectionFunction().Construct(r, th);
+            var phi = new CoordinateFunctions().Construct(r, th);
+            var count = phi.Count;
+            var u = new U(count).GetExpression(r, th);
             // Compile to IL code using the variables given.
 
-            var e2 = new FOperator().Apply(new Omega().GetExpression(r, th), r, th).Value(r | 1, th | 1);
+            // var e2 = new FOperator().Apply(new Omega().GetExpression(r, th), r, th).Value(r | 1, th | 1);
 
-            var rp = this.GetRightPartAsync(count, f, u);
-            var lp = this.GetLeftPartAsync(count, f, phi);
+            var rp = this.GetRightPartAsync(count, f, u, r, th);
+            var lp = this.GetLeftPartAsync(count, f, phi, r, th);
 
             int info;
             double[] alphas;
@@ -73,38 +73,33 @@
             this.Worker.ReportProgress(this.Progress);
         }
 
-        private double[] GetRightPartAsync(int count, IList<IVariabledFunction> f, IVariabledFunction u)
+        private double[] GetRightPartAsync(int count, IList<Function> f, Function u, Variable r, Variable th)
         {
             var result = new double[count];
             var fo = new FOperator();
-            var r = new Variable();
-            var th = new Variable();
             var j = new Jacobian().GetExpression(r, th);
-            var fApplied = fo.Apply(u.GetExpression(r, th), r, th);
+            var fApplied = fo.Apply(u, r, th);
             for (var i = 0; i < count; ++i)
             {
-                var @int = Integration.Integrate(Compiler.Compile(j * f[i].GetExpression(r, th) * fApplied, r, th));
-                result[i] = Common.Instance.R * @int;
+                result[i] = Integration.Integrate(Compiler.Compile(f[i] * fApplied, r, th));
             }
 
             return result;
 
         }
 
-        private double[, ] GetLeftPartAsync(int count, IList<IVariabledFunction> f, IList<IVariabledFunction> phi)
+        private double[,] GetLeftPartAsync(int count, IList<Function> f, IList<Function> phi, Variable r, Variable th)
         {
             var result = new double[count, count];
             var e2 = new E2();
-            var r = new Variable();
-            var th = new Variable();
             var jac = new Jacobian().GetExpression(r, th);
             for (var i = 0; i < count; ++i)
             {
-                var fe = f[i].GetExpression(r, th);
+                var fe = f[i];
                 for (var j = 0; j < count; ++j)
                 {
-                    var e2phi = e2.Apply(phi[j].GetExpression(r, th), r, th);
-                    var @int = Integration.Integrate(Compiler.Compile(e2phi * fe * jac, r, th));
+                    var e2phi = e2.Apply(phi[j], r, th);
+                    var @int = Integration.Integrate(Compiler.Compile(e2phi * fe, r, th));
                     result[i, j] = @int;
                 }
             }

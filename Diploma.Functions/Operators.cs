@@ -15,7 +15,7 @@ namespace Diploma.Functions
         public override Function Apply(Function f, Variable r, Variable th)
         {
  	        return f.Derivative(r, 2) + Function.Sin(th) / Function.Pow(r, 2) *
-                (1 / Function.Sin(th) * f.Derivative(th, 1)).Derivative(th, 1);
+                (1 / Function.Sin(th) * f.Derivative(th)).Derivative(th);
         }
     }
 
@@ -33,11 +33,11 @@ namespace Diploma.Functions
         public override Function Apply(Function f, Variable r, Variable th)
         {
             var e = new E();
- 	        return ( 1 / (Function.Pow(r, 2) * Function.Sin(th))) *
-                (f.Derivative(th, 1) * e.Apply(f, r, th).Derivative(r, 1)
-                    - f.Derivative(r, 1) * e.Apply(f, r, th).Derivative(th, 1))
-                + (1 / (Function.Pow(r, 2) * Function.Sin(th))) * (2 * Common.Cot(th) * f.Derivative(r, 1)
-                    - 2 * f.Derivative(th) / r) * e.Apply(f, r, th);
+ 	        return Common.Instance.R * (( 1 / (Function.Pow(r, 2) * Function.Sin(th))) *
+                (f.Derivative(th, 1) * e.Apply(f, r, th).Derivative(r)
+                    - f.Derivative(r) * e.Apply(f, r, th).Derivative(th))
+                + (1 / (Function.Pow(r, 2) * Function.Sin(th))) * (2 * Common.Cot(th) * f.Derivative(r)
+                    - 2 * f.Derivative(th) / r) * e.Apply(f, r, th));
         }
     }
 
@@ -45,11 +45,11 @@ namespace Diploma.Functions
     {
         public override Function Apply(Function f, Variable r, Variable th)
         {
-            var e = new E();
+            var e2 = new E2();
             var b = new B();
+            var psi0 = new Psi0();
 
-            return b.Apply(f, r, th) + Common.Instance.Uinf * Function.Cos(th) * e.Apply(f, r, th).Derivative(r)
-                 - Common.Instance.Uinf * (Function.Sin(th) / r) * e.Apply(f, r, th).Derivative(th);
+            return b.Apply(f + psi0.GetExpression(r, th), r, th) - e2.Apply(psi0.GetExpression(r, th), r, th);
         }
     }
 }

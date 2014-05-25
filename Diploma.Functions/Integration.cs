@@ -27,9 +27,9 @@ namespace Diploma.Functions
             #endregion
 
             double sum = 0.0;
-            for (int i = 0; i < NNGauss - 1; ++i)
+            for (int i = 0; i < NNGauss; ++i)
             {
-                for (int j = 0; j < NNGauss - 1; ++j)
+                for (int j = 0; j < NNGauss; ++j)
                 {
                     double value = MakeReplacement(c1 / 2 + c2 / 2 * T[i],  halfPi + halfPi * T[j], func);
                     sum += CG[i] * CG[j] * value;
