@@ -3,10 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Diploma.Managed;assembly=Diploma.Managed"
         xmlns:funcs="clr-namespace:Diploma.Functions;assembly=Diploma.Functions"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="575">
 
-    <StackPanel Orientation="Horizontal">
-        <Grid>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -28,26 +32,31 @@
             <Label Grid.Row="0" Grid.Column="0">Исходные данные:</Label>
             <Label Grid.Row="0" Grid.Column="1">Уравнение эллипсоида</Label>
             <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">a =</Label>
-            <TextBox Name="A" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="125" Text="{Binding A, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
+            <TextBox Name="A" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding A, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
             <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right">b =</Label>
-            <TextBox Name="B" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Width="125" Text="{Binding B, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
+            <TextBox Name="B" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding B, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
             <Label Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right">Uinf =</Label>
-            <TextBox Name="Uinf" Grid.Row="3" Grid.Column="1" Width="125" HorizontalAlignment="Left" Text="{Binding Uinf, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
+            <TextBox Name="Uinf" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Uinf, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
             <Label Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right">M =</Label>
-            <TextBox Name="M" Grid.Row="4" Grid.Column="1" Width="125" HorizontalAlignment="Left" Text="{Binding M, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
-            <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right">R =</Label>
-            <TextBox Name="R" Grid.Row="5" Grid.Column="1" Width="125" HorizontalAlignment="Left" Text="{Binding R, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
+            <TextBox Name="M" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding M, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
+            <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right">Re =</Label>
+            <TextBox Name="R" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Re, Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
             <Label Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right">Кол-во коорд. функций =</Label>
-            <TextBox Grid.Row="6" Name="M1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding N , Source={x:Static funcs:Common.Instance}}" Width="125"></TextBox>
+            <TextBox Grid.Row="6" Name="N" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding N , Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
             <Label Grid.Row="7" Grid.Column="0" HorizontalAlignment="Right">Число точек для квадратур Гаусса</Label>
-            <TextBox Grid.Row="7" Name="NNGauss" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding NNGauss , Source={x:Static funcs:Common.Instance}}" Width="125"></TextBox>
-            <ProgressBar Name="ProgressBar" Grid.ColumnSpan="2" Grid.Row="8" Height="20" Margin="5 ,5, 5, 5" Value="0" Minimum="0" Maximum="100"></ProgressBar>
+            <TextBox Grid.Row="7" Name="NNGauss" Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding NNGauss , Source={x:Static funcs:Common.Instance}, UpdateSourceTrigger=LostFocus}"></TextBox>
+            <ProgressBar Name="ProgressBar" Grid.ColumnSpan="2" Grid.Row="8" Height="20" Value="0" Minimum="0" Maximum="100"></ProgressBar>
             <Label Grid.Row="9" Grid.Column="0" HorizontalAlignment="Right" Content="Затраченное время:"></Label>
             <Label Name="time" Grid.Row="9" Grid.Column="1" HorizontalAlignment="Left"></Label>
             <Button Grid.Row="10"  Height="25" Width="50" Grid.Column="0" HorizontalAlignment="Center" Name="BeginIteration" Click="Button_Click">Расчёт</Button>
+            <Label Name="CompletedText" Grid.Row="10" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden">Расчет окончен.</Label>
             
         </Grid>
-        <WrapPanel Width="120" Name="ButtonsPanel">
-        </WrapPanel>
-    </StackPanel>
+        <Grid Grid.Column="1" Name="ButtonsPanel">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="25"></ColumnDefinition>
+                <ColumnDefinition Width="*" ScrollViewer.PanningMode="VerticalOnly"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+        </Grid>
+    </Grid>
 </Window>

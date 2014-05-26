@@ -2,6 +2,7 @@
 namespace Diploma.Functions
 {
     using FuncLib.Functions;
+    using FuncLib.Functions.Compilation;
     using System;
     using System.ComponentModel;
 
@@ -129,7 +130,7 @@ namespace Diploma.Functions
             }
         }
 
-        public double R
+        public double Re
         {
             get
             {
@@ -141,7 +142,7 @@ namespace Diploma.Functions
                 if (double.TryParse(value.ToString(), out result))
                 {
                     r = result;
-                    this.OnPropertyChanged("R");
+                    this.OnPropertyChanged("Re");
                 }
             }
         }
@@ -289,6 +290,11 @@ namespace Diploma.Functions
             }
 
             this.alpha = newAlphas;
+        }
+
+        public double GetNorm()
+        {
+            return Integration.Integrate(Compiler.Compile(this.GetExpression(this.R, this.Th), this.R, this.Th));
         }
     }
 }

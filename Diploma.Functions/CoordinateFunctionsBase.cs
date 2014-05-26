@@ -103,11 +103,17 @@ namespace Diploma.Functions
 
     internal class Psi0 : VariabledFunction
     {
+        public double R { get; private set; }
+        public Psi0()
+        {
+            this.R = Math.Min(Common.Instance.A, Common.Instance.B);
+        }
+
         public override Function GetExpression(Variable r, Variable th)
         {
             var o2 = new Omega2();
-            return 0.25 * (Common.Instance.Uinf * Function.Pow(r - Common.Instance.R, 2)
-                * (2 + Common.Instance.R / r) * Function.Pow(Function.Sin(th), 2));
+            return 0.25 * (Common.Instance.Uinf * Function.Pow(r - this.R, 2)
+                * (2 + this.R / r) * Function.Pow(Function.Sin(th), 2));
 
             //return o2.GetExpression(r, th) * 0.5 * Common.Instance.Uinf *
             //    Function.Pow(r, 2) * Function.Pow(Function.Sin(th), 2);

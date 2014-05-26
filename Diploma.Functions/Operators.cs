@@ -33,7 +33,7 @@ namespace Diploma.Functions
         public override Function Apply(Function f, Variable r, Variable th)
         {
             var e = new E();
- 	        return Common.Instance.R * (( 1 / (Function.Pow(r, 2) * Function.Sin(th))) *
+ 	        return Common.Instance.Re * (( 1 / (Function.Pow(r, 2) * Function.Sin(th))) *
                 (f.Derivative(th, 1) * e.Apply(f, r, th).Derivative(r)
                     - f.Derivative(r) * e.Apply(f, r, th).Derivative(th))
                 + (1 / (Function.Pow(r, 2) * Function.Sin(th))) * (2 * Common.Cot(th) * f.Derivative(r)

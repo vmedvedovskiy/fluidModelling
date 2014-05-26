@@ -13,9 +13,6 @@ namespace Diploma.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public string Result { get; set; }
-        public int Min { get; set; }
-        public int Max { get; set; }
         public Nonlinear Alghoritm { get; set; }
 
         public MainWindow()
@@ -43,22 +40,39 @@ namespace Diploma.GUI
                 }));
             };
 
+            this.Alghoritm.ComputationCompleted += (sender, e) =>
+            {
+                this.CompletedText.Visibility = System.Windows.Visibility.Visible;
+            };
+
             this.Alghoritm.Worker.RunWorkerAsync();
         }
 
         private void AppendResultButton(IterationCompletedArgs e)
         {
+            var row = new RowDefinition();
+            row.Height = new GridLength(24, GridUnitType.Auto);
+
             this.ProgressBar.Value = 0;
             var button = new Button();
-            button.Width = 24;
-            button.Height = 24;
             button.Content = e.Number;
             button.Click += (bs, be) =>
             {
-                Clipboard.SetText(FormatOutput(e.Alphas));
+                Clipboard.SetDataObject(FormatOutput(e.Alphas));
             };
 
+            var label = new Label();
+            label.Content = e.Norm.ToString("{0.###E+000}");
+            this.ButtonsPanel.RowDefinitions.Add(row);
+
+            Grid.SetColumn(button, 0);
+            Grid.SetColumn(label, 1);
+            var rowIdx = this.ButtonsPanel.RowDefinitions.IndexOf(row);
+            Grid.SetRow(button, rowIdx);
+            Grid.SetRow(label, rowIdx);
             this.ButtonsPanel.Children.Add(button);
+            this.ButtonsPanel.Children.Add(label);
+
         }
 
         private void Reset()
@@ -70,6 +84,7 @@ namespace Diploma.GUI
             this.R.IsEnabled = false;
             this.Uinf.IsEnabled = false;
             this.NNGauss.IsEnabled = false;
+            this.N.IsEnabled = false;
             this.BeginIteration.IsEnabled = false;
         }
 
@@ -81,12 +96,13 @@ namespace Diploma.GUI
             this.R.IsEnabled = true;
             this.Uinf.IsEnabled = true;
             this.NNGauss.IsEnabled = true;
+            this.N.IsEnabled = true;
             this.BeginIteration.IsEnabled = true;
         }
 
         private static string FormatOutput(double[] input)
         {
-            return string.Format("{{ {0} }}", string.Join(" ", input.Select(x => x.ToString("0.0000000"))).Replace(",", ".").Replace(" ", ","));
+            return string.Format("{{ {0} }}", string.Join(" ", input.Select(x => x.ToString("0.000000000"))).Replace(",", ".").Replace(" ", ","));
         }
     }
 }
