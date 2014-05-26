@@ -181,23 +181,6 @@ namespace Diploma.Functions
                 }
             }
         }
-
-        public Function Jacobian
-        {
-            get
-            {
-                if (this._jacobian == null)
-                {
-                    Variable r = new Variable();
-                    Variable th = new Variable();
-
-                    this._jacobian = a * b * r * Function.Pow(Function.Cos(th), 2)
-                        + a * b * r * Function.Pow(Function.Sin(th), 2);
-                }
-
-                return this._jacobian;
-            }
-        }
         
         #endregion
 
@@ -217,7 +200,11 @@ namespace Diploma.Functions
             else
             {
                 result = (-1 / fact(n - 1))
-                    * (Function.Pow((Function.Pow(r, 2) - 1) / 2, n - 1).Derivative(v, n - 2));
+                    * (Function.Pow((Function.Pow(v, 2) - 1) / 2, n - 1).Derivative(v, n - 2));
+
+                var pv = new PartialValueEvaluation(Point.Empty);
+                pv.AddPartialValue(v, r);
+                result = result.PartialValue(pv);
             }
 
             return result;
@@ -241,17 +228,6 @@ namespace Diploma.Functions
         }
 
         #endregion
-    }
-
-    public class Omega : VariabledFunction
-    {
-        public override Function GetExpression(Variable r, Variable th)
-        {
-            var omega = ((Function.Pow(r, 2)) * Function.Pow(Function.Cos(th), 2)) / Function.Pow(Common.Instance.A, 2) +
-                    ((Function.Pow(r, 2)) * Function.Pow(Function.Sin(th), 2)) / Function.Pow(Common.Instance.B, 2) - 1;
-
-            return 1 - Function.Exp(Common.Instance.M * omega / (omega - Common.Instance.M));
-        }
     }
 
     public class U : VariabledFunction

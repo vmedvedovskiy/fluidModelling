@@ -72,15 +72,16 @@
         {
             Variable r = new Variable();
             Variable th = new Variable();
-
-            var f = new ProjectionFunction().Construct(r, th);
-            var phi = new CoordinateFunctions().Construct(r, th);
-            var count = phi.Count;
-            var u = new U(count);
             double[,] lp = null;
+
             this.Worker.DoWork += (sender, e) =>
             {
+                var f = new ProjectionFunction().Construct(r, th);
+                var phi = new CoordinateFunctions().Construct(r, th);
+                var count = phi.Count;
+                var u = new U(count);
                 var Re = Common.Instance.Re;
+
                 while (true && this.iterationsCount < MAX_ITERATIONS)
                 {
                     // считаем линейную задачу для начального приближения
@@ -100,6 +101,7 @@
                     }
 
                     var norm = DoIteration(lp, r, th, f, count, u);
+                    this.actionsCount = count;
                     if (norm <= this.eps && this.iterationsCount > 1)
                     {
                         break;
@@ -110,8 +112,6 @@
 
         private double DoIteration(double[,] lp, Variable r, Variable th, IList<Function> f, int count, U u)
         {
-            this.actionsCount = count;
-
             var uf = u.GetExpression(r, th);
             var rp = this.GetRightPartAsync(count, f, uf, r, th);
 
@@ -133,7 +133,6 @@
         {
             var result = new double[count];
             var fo = new FOperator();
-            //var j = new Jacobian().GetExpression(r, th);
             for (var i = 0; i < count; ++i)
             {
                 this.ReportProgress();
@@ -148,7 +147,6 @@
         {
             var result = new double[count, count];
             var e2 = new E2();
-            //var jac = new Jacobian().GetExpression(r, th);
             for (var i = 0; i < count; ++i)
             {
                 for (var j = 0; j < count; ++j)

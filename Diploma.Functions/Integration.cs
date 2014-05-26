@@ -31,8 +31,7 @@ namespace Diploma.Functions
             {
                 for (int j = 0; j < NNGauss; ++j)
                 {
-                    double value = MakeReplacement(c1 / 2 + c2 / 2 * T[i],  halfPi + halfPi * T[j], func);
-                    sum += CG[i] * CG[j] * value;
+                    sum += CG[i] * CG[j] * MakeReplacement(c1 / 2 + c2 / 2 * T[i], halfPi + halfPi * T[j], func);
                 }
             }
 
@@ -53,17 +52,6 @@ namespace Diploma.Functions
         {
             int info;
             alglib.gqgenerategausslegendre(n, out info, out T, out CG);
-        }
-    }
-
-    public class Jacobian : VariabledFunction
-    {
-        public override Function GetExpression(Variable r, Variable th)
-        {
-            var a = Common.Instance.A;
-            var b = Common.Instance.B;
-            return a * b * r * Function.Pow(Function.Cos(th), 2)
-                        + a * b * r * Function.Pow(Function.Sin(th), 2);
         }
     }
 }

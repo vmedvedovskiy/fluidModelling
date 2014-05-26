@@ -65,6 +65,17 @@ namespace Diploma.Functions
         }
     }
 
+    public class Omega : VariabledFunction
+    {
+        public override Function GetExpression(Variable r, Variable th)
+        {
+            var omega = ((Function.Pow(r, 2)) * Function.Pow(Function.Cos(th), 2)) / Function.Pow(Common.Instance.A, 2) +
+                    ((Function.Pow(r, 2)) * Function.Pow(Function.Sin(th), 2)) / Function.Pow(Common.Instance.B, 2) - 1;
+
+            return 1 - Function.Exp(Common.Instance.M * omega / (omega - Common.Instance.M));
+        }
+    }
+
     internal class Omega2 : VariabledFunction
     {
         public override Function GetExpression(Variable r, Variable th)
@@ -103,20 +114,17 @@ namespace Diploma.Functions
 
     internal class Psi0 : VariabledFunction
     {
-        public double R { get; private set; }
+        public double Radius { get; private set; }
         public Psi0()
         {
-            this.R = Math.Min(Common.Instance.A, Common.Instance.B);
+            this.Radius = Math.Min(Common.Instance.A, Common.Instance.B);
         }
 
         public override Function GetExpression(Variable r, Variable th)
         {
             var o2 = new Omega2();
-            return 0.25 * (Common.Instance.Uinf * Function.Pow(r - this.R, 2)
-                * (2 + this.R / r) * Function.Pow(Function.Sin(th), 2));
-
-            //return o2.GetExpression(r, th) * 0.5 * Common.Instance.Uinf *
-            //    Function.Pow(r, 2) * Function.Pow(Function.Sin(th), 2);
+            return o2.GetExpression(r, th) * 0.25 * Common.Instance.Uinf * Function.Pow(r - this.Radius, 2)
+                * (2 + this.Radius / r) * Function.Pow(Function.Sin(th), 2);
         }
     }
 
